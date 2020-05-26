@@ -109,6 +109,14 @@ def extract_policies_without_domains(keyword: str, data_entries: [str]):
     return policy_records
 
 
+def extract_policies_using_localhost(data_entries: [str]):
+    policy_records = []
+    for entry in data_entries:
+        parts = entry.split(',')
+        csp = parts[2]
+        if 'localhost' in csp:
+            policy_records.append(f'{parts[0]}, {parts[1]}, {parts[2]}\n')
 
+    return policy_records
 
 

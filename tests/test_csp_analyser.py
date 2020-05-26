@@ -1,6 +1,7 @@
 import pytest
 from csp_tool.csp_analyser import get_domains_per_directive, rollup_data_by_header, \
-    check_unsafe_inline_used_without_domains, extract_policies_without_domains, check_keyword_used_without_domains
+    check_unsafe_inline_used_without_domains, extract_policies_without_domains, \
+    check_keyword_used_without_domains, extract_policies_using_localhost
 
 
 def generate_known_test_data():
@@ -173,4 +174,12 @@ def test_extract_policies_with_missing_domains_with_domains_unsafe_eval_from_dat
     assert 'repo1' == parts[0]
     assert 'file1' == parts[1].lstrip()
     assert "default-src 'self' 'unsafe-eval' data:" == parts[2].lstrip()
+
+
+def test_extract_entries_containing_localhost():
+    entries = generate_known_test_data()
+    expected_count = 1
+
+    extracted_entries = extract_policies_using_localhost(entries)
+    assert expected_count == len(extracted_entries)
 
