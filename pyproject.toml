@@ -5,7 +5,7 @@ description = "Tools for review of Content Security Policies (python 3.8 compati
 license = "Apache-2.0"
 repository = "https://github.com/hmrc/csp-tool"
 authors = ["tess-barnes-mt <tess.barnes@digital.hmrc.gov.uk>"]
-maintainers = ["tess-barnes-mt <tess.barnes@madetech.com>", "Tess Barnes <tess@tessbarnes.uk>"]
+maintainers = ["tess-barnes-mt <tess.barnes@madetech.com>", "Tess Barnes <tess@tessbarnes.uk>", "Jez Daniels <jez.daniels@digital.hmrc.gov.uk>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
