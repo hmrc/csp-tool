@@ -1,11 +1,11 @@
 import pytest
-from csp_tool.csp_extractor import extract_csp_part_from_java_like_entry, extract_full_csp, decode_base64_entries
+from csp_tool.csp_extractor import extract_csp_part_from_java_like_entry, extract_full_csp, decode_base64_entry
 
 
 def test_can_decode_base64_entry():
-    plain = b"default-src 'self' 'unsafe-inline' 'unsafe-eval' www.googletagmanager.com www.google-analytics.com tagmanager.google.com fonts.googleapis.com ssl.gstatic.com www.gstatic.com fonts.gstatic.com fonts.googleapis.com data:;"
+    plain = "default-src 'self' 'unsafe-inline' 'unsafe-eval' www.googletagmanager.com www.google-analytics.com tagmanager.google.com fonts.googleapis.com ssl.gstatic.com www.gstatic.com fonts.gstatic.com fonts.googleapis.com data:;"
     base_64_csp = 'ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwnIHd3dy5nb29nbGV0YWdtYW5hZ2VyLmNvbSB3d3cuZ29vZ2xlLWFuYWx5dGljcy5jb20gdGFnbWFuYWdlci5nb29nbGUuY29tIGZvbnRzLmdvb2dsZWFwaXMuY29tIHNzbC5nc3RhdGljLmNvbSB3d3cuZ3N0YXRpYy5jb20gZm9udHMuZ3N0YXRpYy5jb20gZm9udHMuZ29vZ2xlYXBpcy5jb20gZGF0YTo7'
-    decoded = decode_base64_entries(base_64_csp)
+    decoded = decode_base64_entry(base_64_csp)
 
     assert plain == decoded
 
@@ -17,16 +17,16 @@ def test_can_extract_csp_pair_from_java_like_string():
     assert expected_extracted_value == extract_csp_part_from_java_like_entry(java_like)
 
 
-def test_rejects_base64_csp_strings():
+def test_highlights_base64_csp_strings():
     base_64_csp = 'play.filters.headers.contentSecurityPolicy.base64 = "ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwnIHd3dy5nb29nbGV0YWdtYW5hZ2VyLmNvbSB3d3cuZ29vZ2xlLWFuYWx5dGljcy5jb20gdGFnbWFuYWdlci5nb29nbGUuY29tIGZvbnRzLmdvb2dsZWFwaXMuY29tIHNzbC5nc3RhdGljLmNvbSB3d3cuZ3N0YXRpYy5jb20gZm9udHMuZ3N0YXRpYy5jb20gZm9udHMuZ29vZ2xlYXBpcy5jb20gZGF0YTo7"'
-    expected_return = 'base64'
+    expected_return = 'base64: ' + 'ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwnIHd3dy5nb29nbGV0YWdtYW5hZ2VyLmNvbSB3d3cuZ29vZ2xlLWFuYWx5dGljcy5jb20gdGFnbWFuYWdlci5nb29nbGUuY29tIGZvbnRzLmdvb2dsZWFwaXMuY29tIHNzbC5nc3RhdGljLmNvbSB3d3cuZ3N0YXRpYy5jb20gZm9udHMuZ3N0YXRpYy5jb20gZm9udHMuZ29vZ2xlYXBpcy5jb20gZGF0YTo7'
 
     assert expected_return == extract_full_csp(base_64_csp)
 
 
-def test_rejects_base64_csp_strings_without_prefix():
+def test_highlights_base64_csp_strings_without_prefix():
     base_64_csp = 'contentSecurityPolicy ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwnIHd3dy5nb29nbGV0YWdtYW5hZ2VyLmNvbSB3d3cuZ29vZ2xlLWFuYWx5dGljcy5jb20gdGFnbWFuYWdlci5nb29nbGUuY29tIGZvbnRzLmdvb2dsZWFwaXMuY29tIHNzbC5nc3RhdGljLmNvbSB3d3cuZ3N0YXRpYy5jb20gZm9udHMuZ3N0YXRpYy5jb20gZm9udHMuZ29vZ2xlYXBpcy5jb20gZGF0YTo7'
-    expected_return = 'base64'
+    expected_return = 'base64: ' + 'ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwnIHd3dy5nb29nbGV0YWdtYW5hZ2VyLmNvbSB3d3cuZ29vZ2xlLWFuYWx5dGljcy5jb20gdGFnbWFuYWdlci5nb29nbGUuY29tIGZvbnRzLmdvb2dsZWFwaXMuY29tIHNzbC5nc3RhdGljLmNvbSB3d3cuZ3N0YXRpYy5jb20gZm9udHMuZ3N0YXRpYy5jb20gZm9udHMuZ29vZ2xlYXBpcy5jb20gZGF0YTo7'
 
     assert expected_return == extract_full_csp(base_64_csp)
 
@@ -42,7 +42,7 @@ def test_rejects_base64_csp_strings_without_prefix():
         ("#filters.headers.contentSecurity default-src 'self' 'unsafe-inline' localhost:9000 localhost:9032 localhost:9250 stats.g.doubleclick.net www.google-analytics.com object-src 'none'","default-src 'self' 'unsafe-inline' localhost:9000 localhost:9032 localhost:9250 stats.g.doubleclick.net www.google-analytics.com object-src 'none'"),
         ("play.filters.headers.contentSecurity default-src 'self' 'unsafe-inline' www.google-analytics.com app.optimizely.com cdn.optimizely.com *.optimizely.com optimizely.s3.amazonaws.com data:", "default-src 'self' 'unsafe-inline' www.google-analytics.com app.optimizely.com cdn.optimizely.com *.optimizely.com optimizely.s3.amazonaws.com data:"),
         ('play.filters.headers.contentSecurityPolicy: "default-src"', 'default-src'),
-        ('play.filters.headers.contentSecurityPolicy: "ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwn"', 'base64'),
+        ('play.filters.headers.contentSecurityPolicy: "ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwn"', 'base64: ' + 'ZGVmYXVsdC1zcmMgJ3NlbGYnICd1bnNhZmUtaW5saW5lJyAndW5zYWZlLWV2YWwn'),
         ("headers.contentSecurityPolicy= \"default-src 'self' 'unsafe-inline' analytics.analytics-egain.com localhost:9032 localhost:9310 *.optimizely.com optimizely.s3.amazonaws.com www.google-analytics.com www.googletagmanager.com fonts.googleapis.com tagmanager.google.com ssl.gstatic.com www.gstatic.com fonts.gstatic.com data:\"", "default-src 'self' 'unsafe-inline' analytics.analytics-egain.com localhost:9032 localhost:9310 *.optimizely.com optimizely.s3.amazonaws.com www.google-analytics.com www.googletagmanager.com fonts.googleapis.com tagmanager.google.com ssl.gstatic.com www.gstatic.com fonts.gstatic.com data:"),
         ("//play.filters.headers.contentSecurityPolicy = \"default-src 'self' localhost:9000 localhost:9032 localhost:9250 www.google-analytics.com\"", "default-src 'self' localhost:9000 localhost:9032 localhost:9250 www.google-analytics.com"),
     ],

@@ -5,7 +5,7 @@ base64_csp_prefixes = [
 ]
 
 csp_prefixes = [
-
+    'play.filters.headers.contentSecurityPolicy.base64',
     'play.filters.headers.contentSecurityPolicy',
     'play.filters.headers.contentSecurity',
     'filters.headers.security.contentSecurityPolicy',
@@ -57,12 +57,22 @@ def extract_csp_part_from_java_like_entry(entry: str):
                     break
         else:
             break
-
+    if is_base64_like(sanitised_entry):
+        return f'base64: {sanitised_entry}'
     return sanitised_entry
 
 
-def decode_base64_entries(entry):
-    return base64.b64decode(entry)
+def decode_base64_entry(entry: str):
+    try:
+        bytes = base64.b64decode(entry)
+        return bytes.decode('utf-8')
+
+    except Exception as e:
+        return None
+
+
+def is_base64_like(entry: str):
+    return len(entry) > 30 and entry.find(' ') == -1
 
 
 def extract_full_csp(entry: str):
@@ -78,9 +88,9 @@ def extract_full_csp(entry: str):
 
     entry = entry.strip().lstrip('#').lstrip('/').lstrip().strip('"')
 
-    for base64 in base64_csp_prefixes:
-        if entry.startswith(base64):
-            return 'base64'
+    # for base64 in base64_csp_prefixes:
+    #     if entry.startswith(base64):
+    #         return 'base64'
 
     start_index = 0
 
@@ -97,8 +107,8 @@ def extract_full_csp(entry: str):
 
     # could still be a base64 encoded string.
     # NAIVE check: check if it is longer than longest directive and contains no spaces
-    if len(csp) > 30 and csp.find(' ') == -1:
-        return 'base64'
+    if is_base64_like(csp):
+        return f'base64: {csp}'
 
     return csp
 
