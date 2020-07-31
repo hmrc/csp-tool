@@ -93,6 +93,16 @@ def check_keyword_used_without_domains(keyword: str, csp: dict):
     # could be rewritten to use filter or dropwhile from itertools
     return False
 
+def check_keyword_used_with_domains(keyword: str, csp: dict):
+    if keyword in ['self', 'None']:
+        # domains don't apply here
+        return False
+    for directive in csp.keys():
+        if keyword in csp[directive]['keywords']:
+            if len(csp[directive]['domains']) > 0:
+                return True
+    # could be rewritten to use filter or dropwhile from itertools
+    return False
 
 def check_unsafe_inline_used_without_domains(csp: dict):
     return check_keyword_used_without_domains('unsafe-inline', csp)
@@ -104,6 +114,16 @@ def extract_policies_without_domains(keyword: str, data_entries: [str]):
         parts = entry.split(',')
         csp = parse_csp(parts[2])
         if check_keyword_used_without_domains(keyword, csp):
+            policy_records.append(f'{parts[0]}, {parts[1]}, {parts[2]}\n')
+
+    return policy_records
+
+def extract_policies_with_domains(keyword: str, data_entries: [str]):
+    policy_records = []
+    for entry in data_entries:
+        parts = entry.split(',')
+        csp = parse_csp(parts[2])
+        if check_keyword_used_with_domains(keyword, csp):
             policy_records.append(f'{parts[0]}, {parts[1]}, {parts[2]}\n')
 
     return policy_records
