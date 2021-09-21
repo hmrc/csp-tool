@@ -54,10 +54,10 @@ If you can't find this package as `csp-tool` on pypi.org (and therefore pip) you
 can still install it as a module in your consuming project by using
 
 ```bash
-pip install /path/to/csp_tool-0.1.0-py3-none-any.whl
+pip install /path/to/csp_tool-0.2.0-py3-none-any.whl
 ```
 
-or list `./../relative/path/to/csp_tool-0.1.0-py3-none-any.whl` in your
+or list `./../relative/path/to/csp_tool-0.2.0-py3-none-any.whl` in your
 requirements.txt file.
 
 If you're using Poetry in your own project you can add this to your
@@ -65,5 +65,5 @@ If you're using Poetry in your own project you can add this to your
 
 ```toml
 [tool.poetry.dependencies]
-my-package = { file = "path/to/csp_tool-0.1.0-py3-none-any.whl" }
+my-package = { file = "path/to/csp_tool-0.2.0-py3-none-any.whl" }
 ```
